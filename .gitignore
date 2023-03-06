@@ -3,6 +3,13 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+
+dataset/*
+recognizer/*
+
+teste_match/dataset/*
+teste_match/recognizer/*
+
 # C extensions
 *.so
 
