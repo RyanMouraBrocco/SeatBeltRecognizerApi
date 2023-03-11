@@ -49,9 +49,9 @@ def seatbeltValidator():
     for img in allPeopleImages:
         childIds = match_face.recognizeChilds(authenticatededUser.id, img)
         if(childIds.count > 0):
-            isUsingSeatBelt = seat_belt_recognizer.getQuantityOfUsingSeatBelt(
+            quantityOfSeatBelt = seat_belt_recognizer.getQuantityOfUsingSeatBelt(
                 img)
-            if(not isUsingSeatBelt):
+            if(quantityOfSeatBelt < childIds.count):
                 childsInDangerSituation += childIds.count
 
     if(childsInDangerSituation > 0):
