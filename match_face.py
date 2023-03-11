@@ -9,19 +9,22 @@ path = 'data/dataset'
 
 
 def saveNewFaces(userId, childId, imgs):
+    sampleNum = 0
+    for img in imgs:
+        saveNewFace(userId, childId, img, sampleNum)
+        sampleNum += 1
+            
+def saveNewFace(userId, childId, image, index):
     userPath = path + "/" + str(userId)
 
     if(not os.path.exists(userPath)):
         os.makedirs(userPath)
 
-    for img in imgs:
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        faces = faceDetect.detectMultiScale(gray, 1.3, 5)
-        sampleNum = 0
-        for(x, y, w, h) in faces:
-            sampleNum = sampleNum+1
-            cv2.imwrite(userPath + "/Child."+str(childId)+"." +
-                        str(sampleNum)+".jpg", gray[y:y+h, x:x+w])
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    faces = faceDetect.detectMultiScale(gray, 1.3, 5)
+    for(x, y, w, h) in faces:
+        cv2.imwrite(userPath + "/Child."+str(childId)+"." +
+                    str(index)+".jpg", gray[y:y+h, x:x+w])
 
 
 def trainAllUserChilds(userId):
