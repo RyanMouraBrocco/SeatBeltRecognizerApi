@@ -5,7 +5,7 @@ from PIL import Image
 
 faceDetect = cv2.CascadeClassifier(
     cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-path = 'dataset'
+path = 'data/dataset'
 
 
 def saveNewFaces(userId, childId, imgs):
@@ -39,12 +39,12 @@ def trainAllUserChilds(userId):
         cv2.waitKey(10)
     newIds = np.array(childIds)
     recognizer.train(faces, newIds)
-    recognizer.save('recognizer/'+str(userId)+'.yml')
+    recognizer.save('data/recognizer/'+str(userId)+'.yml')
 
 
 def recognizeChilds(userId, image):
     recognizer = cv2.face.LBPHFaceRecognizer_create()
-    recognizer.read("recognizer/"+str(userId)+".yml")
+    recognizer.read("data/recognizer/"+str(userId)+".yml")
     gray=cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
     faces=faceDetect.detectMultiScale(gray,1.3,5)
     recognizeChildIds = []
