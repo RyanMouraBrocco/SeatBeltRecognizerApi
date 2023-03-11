@@ -15,6 +15,8 @@ import match_face
 app = Flask(__name__)
 
 # AUTHENTICATION
+
+
 def authenticateUser():
     key = request.headers.get('auth')
     conn = sqllite_access.createIfNotDatabase()
@@ -33,18 +35,26 @@ def getImageFromRequestBody():
 
 @app.route("/SeatBelt/Validator", methods=['POST'])
 def seatbeltValidator():
-    image = getImageFromRequestBody()
-    quantityOfPeople = face_recognizer.getFacesQuantity(image)
+    authenticatededUser = authenticateUser()
+    if(authenticatededUser == None):
+        return (401, "User not authenticated")
 
-    if(quantityOfPeople == 0):
+    image = getImageFromRequestBody()
+    allPeopleImages = face_recognizer.getAllPeopleInImage(image)
+
+    if(allPeopleImages.count == 0):
         return 'true'
 
-    print('Quantity of people: ' + str(quantityOfPeople))
-    quantityOfUsingSeatBelt = seat_belt_recognizer.getQuantityOfUsingSeatBelt(
-        image)
+    childsInDangerSituation = 0
+    for img in allPeopleImages:
+        childIds = match_face.recognizeChilds(authenticatededUser.id, img)
+        if(childIds.count > 0):
+            isUsingSeatBelt = seat_belt_recognizer.getQuantityOfUsingSeatBelt(
+                img)
+            if(not isUsingSeatBelt):
+                childsInDangerSituation += childIds.count
 
-    print('Quantity of seatbeld: ' + str(quantityOfUsingSeatBelt))
-    if(quantityOfPeople > quantityOfUsingSeatBelt):
+    if(childsInDangerSituation > 0):
         return 'false'
     else:
         return 'true'
@@ -142,5 +152,5 @@ def TrainChildImage():
     authenticatededUser = authenticateUser()
     if(authenticatededUser == None):
         return (401, "User not authenticated")
-    
+
     match_face.trainAllUserChilds(authenticatededUser.Id)
