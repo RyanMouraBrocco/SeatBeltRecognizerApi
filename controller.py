@@ -41,7 +41,7 @@ def seatbeltValidator():
         return (401, "User not authenticated")
 
     image = getImageFromRequestBody()
-    cv2.imwrite("test.jpg", image)
+    #cv2.imwrite("test.jpg", image)
     allPeopleImages = face_recognizer.getAllPeopleInImage(image)
 
     if(len(allPeopleImages) == 0):
@@ -49,7 +49,7 @@ def seatbeltValidator():
 
     childsInDangerSituation = 0
     for img in allPeopleImages:
-        cv2.imwrite("test2.jpg", img)
+        #cv2.imwrite("test2.jpg", img)
         childIds = match_face.recognizeChilds(authenticatededUser.id, img)
         if(len(childIds) > 0):
             quantityOfSeatBelt = seat_belt_recognizer.getQuantityOfUsingSeatBelt(

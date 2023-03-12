@@ -28,9 +28,6 @@ beltframe = getImage()
 
 
 def getQuantityOfUsingSeatBelt(image):
-    # Resizing The Image
-    image = imutils.resize(image, height=800)
-
     # Converting To GrayScale
     beltgray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
