@@ -4,8 +4,9 @@ __pycache__/
 *$py.class
 
 
-dataset/*
-recognizer/*
+data/dataset/*
+data/recognizer/*
+*.db
 
 teste_match/dataset/*
 teste_match/recognizer/*

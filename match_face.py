@@ -54,6 +54,6 @@ def recognizeChilds(userId, image):
     recognizeChildIds = []
     for(x,y,w,h) in faces:
         id,conf=recognizer.predict(gray[y:y+h,x:x+w])
-        recognizeChilds(id)
+        recognizeChildIds.append(id)
 
     return recognizeChildIds

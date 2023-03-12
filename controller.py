@@ -11,6 +11,7 @@ from classes.user import User
 import sqllite_access
 import random
 import match_face
+import cv2
 
 app = Flask(__name__)
 
@@ -40,19 +41,21 @@ def seatbeltValidator():
         return (401, "User not authenticated")
 
     image = getImageFromRequestBody()
+    cv2.imwrite("test.jpg", image)
     allPeopleImages = face_recognizer.getAllPeopleInImage(image)
 
-    if(allPeopleImages.count == 0):
+    if(len(allPeopleImages) == 0):
         return 'true'
 
     childsInDangerSituation = 0
     for img in allPeopleImages:
+        cv2.imwrite("test2.jpg", img)
         childIds = match_face.recognizeChilds(authenticatededUser.id, img)
-        if(childIds.count > 0):
+        if(len(childIds) > 0):
             quantityOfSeatBelt = seat_belt_recognizer.getQuantityOfUsingSeatBelt(
                 img)
-            if(quantityOfSeatBelt < childIds.count):
-                childsInDangerSituation += childIds.count
+            if(quantityOfSeatBelt < len(childIds)):
+                childsInDangerSituation += len(childIds)
 
     if(childsInDangerSituation > 0):
         return 'false'
@@ -155,4 +158,5 @@ def TrainChildImage():
     if(authenticatededUser == None):
         abort(401, "User not authenticated")
 
-    match_face.trainAllUserChilds(authenticatededUser.Id)
+    match_face.trainAllUserChilds(authenticatededUser.id)
+    return ""
