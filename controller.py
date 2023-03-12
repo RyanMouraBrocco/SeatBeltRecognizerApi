@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, abort, jsonify
 from flask import request
 import base64
 import numpy as np
@@ -66,21 +66,21 @@ def getUserFromBody():
     return User(0, requestBody["Name"], requestBody["Email"], requestBody["Password"], requestBody["CityId"])
 
 
-@app.route("/Users", method=['POST'])
+@app.route("/Users", methods=['POST'])
 def PostUser():
     user = getUserFromBody()
     conn = sqllite_access.createIfNotDatabase()
     userCheck = sqllite_access.getUserByEmail(conn, user.email)
     if(userCheck != None):
         sqllite_access.closeConnection(conn)
-        return (401, 'Email already inserted')
+        abort(401, 'Email already inserted')
 
     user = sqllite_access.insertUser(conn, user)
     sqllite_access.closeConnection(conn)
-    return jsonify(user)
+    return jsonify(user.serialize())
 
 
-@app.route("/Users/Login", method=['POST'])
+@app.route("/Users/Login", methods=['POST'])
 def Login():
     requestBody = request.get_json()
     email = requestBody["Email"]
@@ -89,12 +89,12 @@ def Login():
     userCheck = sqllite_access.getUserByEmail(conn, email)
     if(userCheck == None or userCheck.password != password):
         sqllite_access.closeConnection(conn)
-        return (401, 'Email or password is wrong')
+        abort(401, 'Email or password is wrong')
 
-    newKey = random.getrandbits(128)
-    sqllite_access.updateUserKey(conn, userCheck.Id, newKey)
+    newKey = str(random.getrandbits(128))
+    sqllite_access.updateUserKey(conn, userCheck.id, newKey)
     sqllite_access.closeConnection(conn)
-    return
+    return newKey
 
 
 # Child
@@ -103,24 +103,25 @@ def getChildFromBody(userId):
     return Child(0, userId, requestBody["Name"])
 
 
-@app.route("/Childs", method=['POST'])
+@app.route("/Childs", methods=['POST'])
 def PostChild():
     authenticatededUser = authenticateUser()
     if(authenticatededUser == None):
-        return (401, "User not authenticated")
+        abort(401, "User not authenticated")
 
     child = getChildFromBody(authenticatededUser.id)
     conn = sqllite_access.createIfNotDatabase()
     child = sqllite_access.insertChild(conn, child)
     sqllite_access.closeConnection(conn)
-    return jsonify(child)
+    return jsonify(child.serialize())
 
 
-@app.route("/Childs/<childId>/UploadImage", method=['POST'])
+@app.route("/Childs/<childId>/UploadImage", methods=['POST'])
 def AddChildImage(childId):
+    childId = int(childId)
     authenticatededUser = authenticateUser()
     if(authenticatededUser == None):
-        return (401, "User not authenticated")
+        abort(401, "User not authenticated")
 
     image = getImageFromRequestBody()
     conn = sqllite_access.createIfNotDatabase()
@@ -131,7 +132,7 @@ def AddChildImage(childId):
     isValidChild = False
     validChild = None
     for child in allChilds:
-        if(child.id == child):
+        if(child.id == childId):
             isValidChild = True
             validChild = child
             break
@@ -139,18 +140,19 @@ def AddChildImage(childId):
     if(isValidChild):
         match_face.saveNewFace(authenticatededUser.id,
                                childId, image, validChild.imageQuantity)
-        sqllite_access.UpdateChildImageQuantity(conn,
+        sqllite_access.updateChildImageQuantity(conn,
                                                 childId, validChild.imageQuantity + 1)
         sqllite_access.closeConnection(conn)
+        return ""
     else:
         sqllite_access.closeConnection(conn)
-        return (401, "Child is not valid")
+        abort(401, "Child is not valid")
 
 
-@app.route("/Childs/Train", method=['POST'])
+@app.route("/Childs/Train", methods=['POST'])
 def TrainChildImage():
     authenticatededUser = authenticateUser()
     if(authenticatededUser == None):
-        return (401, "User not authenticated")
+        abort(401, "User not authenticated")
 
     match_face.trainAllUserChilds(authenticatededUser.Id)

@@ -25,6 +25,7 @@ def saveNewFace(userId, childId, image, index):
     for(x, y, w, h) in faces:
         cv2.imwrite(userPath + "/Child."+str(childId)+"." +
                     str(index)+".jpg", gray[y:y+h, x:x+w])
+        break
 
 
 def trainAllUserChilds(userId):
