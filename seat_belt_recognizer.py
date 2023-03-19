@@ -19,14 +19,6 @@ def getQuantityOfUsingSeatBelt(image):
     edges = cv2.Canny(blur, 50, 600)
     lines = cv2.HoughLinesP(edges, 1, np.pi/270, 70,
                             maxLineGap=50, minLineLength=150)
-    
-    test = edges
-    if lines is not None:
-        for line in lines:
-            x1, y1, x2, y2 = line[0]
-            test = cv2.line(test,(x1,y1),(x2,y2),(255,0,0),10)
-    
-    cv2.imwrite("test.jpg", test)
 
     previousLineSlope = 0
     previousX1, previousY1, previousX2, previousY2 = 0, 0, 0, 0
