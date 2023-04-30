@@ -7,7 +7,7 @@ def getQuantityOfUsingSeatBelt(image):
     belt = 0
 
     qrCodes = getQRCodesInImage(image)
-    if(len(qrCodes) >= 3):
+    if(len(qrCodes) >= 2):
         qrCodeCheck = 0
         for qrCode in qrCodes:
             if(qrCode.value == "https://me-qr.com/text/3035980/show"):
